@@ -1,0 +1,27 @@
+{
+  "name": "projeto16-shortly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Tallispt/projeto16-shortly.git"
+  },
+  "author": "Tallispt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tallispt/projeto16-shortly/issues"
+  },
+  "homepage": "https://github.com/Tallispt/projeto16-shortly#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "pg": "^8.8.0"
+  }
+}
