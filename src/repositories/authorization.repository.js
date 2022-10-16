@@ -1,17 +1,5 @@
 import pg from '../database/db.js';
 
-async function getUserByColumn(columnName, value) {
-    return await pg.query(`SELECT * FROM users WHERE "${columnName}"=$1`, [value])
-}
-
-async function insertUser(name, email, password) {
-    await pg.query("INSERT INTO users(name, email, password) VALUES($1, $2, $3)", [
-        name,
-        email,
-        password
-    ])
-}
-
 async function getAuthTokensByColumn(columnName, value) {
     return pg.query(`SELECT * FROM "authTokens" WHERE "${columnName}"=$1`, [value])
 }
@@ -33,8 +21,6 @@ async function updateToken(userId, token) {
 }
 
 export const authRepository = {
-    getUserByColumn,
-    insertUser,
     getAuthTokensByColumn,
     insertAuthToken,
     updateToken

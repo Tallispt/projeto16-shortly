@@ -1,21 +1,15 @@
-import pg from '../database/db.js';
+import { userRepository } from '../repositories/user.repository.js';
 
 export const userInfo = async (req, res) => {
     const { userId } = res.locals
 
     try {
-        const table = await pg.query(`
-        SELECT users.id, users.name, urls.id as "urlId", urls."shortUrl", urls.url, COALESCE(visits."visitNumber",0) as "visitCount"
-        FROM visits
-        FULL OUTER JOIN urls ON urls.id=visits."urlId"
-        FULL OUTER JOIN users ON users.id=urls."userId"
-        WHERE users.id=$1
-        `, [userId])
+        const userInfo = await userRepository.getUserInfoById(userId)
 
-        if (!table.rowCount) return res.sendStatus(404)
+        if (!userInfo.rowCount) return res.sendStatus(404)
 
-        const shortenedUrls = !table.rows[0].id
-            ? table.rows.map(value => {
+        const shortenedUrls = !userInfo.rows[0].id
+            ? userInfo.rows.map(value => {
                 return {
                     id: value.urlId,
                     shortUrl: value.shortUrl,
@@ -30,8 +24,8 @@ export const userInfo = async (req, res) => {
         }, 0)
 
         res.status(200).send({
-            id: table.rows[0].id,
-            name: table.rows[0].name,
+            id: userInfo.rows[0].id,
+            name: userInfo.rows[0].name,
             visitCount,
             shortenedUrls
         })

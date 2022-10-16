@@ -2,6 +2,7 @@ import pg from '../database/db.js';
 import { nanoid } from 'nanoid';
 
 import { urlSchema } from '../schemas/url.schema.js'
+import { urlRepository } from '../repositories/urls.repository.js';
 
 const shortenUrl = async (req, res) => {
     const { url } = req.body
@@ -13,11 +14,7 @@ const shortenUrl = async (req, res) => {
 
     const shorten = { shortUrl: nanoid(8) }
     try {
-        await pg.query(`INSERT INTO urls("userId", url, "shortUrl") VALUES($1, $2, $3);`, [
-            userId,
-            url,
-            shorten.shortUrl
-        ])
+        await urlRepository.insertUrl(userId, url, shorten.shortUrl)
 
         res.status(201).send(shorten)
     } catch (error) {
@@ -29,14 +26,14 @@ const findUrlById = async (req, res) => {
     const { id } = req.params
 
     try {
-        const url = await pg.query(`SELECT * FROM urls WHERE id=$1;`, [id])
+        const url = await urlRepository.getUrlByColumn('urls', id)
 
         if (!url.rowCount) return res.sendStatus(404)
 
         delete url.rows[0].userId
         delete url.rows[0].createdAt
-        res.status(200).send(url.rows[0])
 
+        res.status(200).send(url.rows[0])
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -46,17 +43,15 @@ const redirectUrl = async (req, res) => {
     const { shortUrl } = req.params
 
     try {
-        const url = await pg.query(`SELECT * FROM urls WHERE "shortUrl"=$1;`, [shortUrl])
+        const url = await urlRepository.getUrlByColumn('shortUrl', shortUrl)
 
         if (!url.rowCount) return res.sendStatus(404)
 
-        const visits = await pg.query(`SELECT * FROM visits WHERE "urlId"=$1;`, [url.rows[0].id])
+        const visits = await urlRepository.getVisitsByColumn('urlId', url.rows[0].id)
 
-        const query = !visits.rowCount
-            ? `INSERT INTO visits("urlId") VALUES(${url.rows[0].id});`
-            : `UPDATE visits SET "visitNumber"=${visits.rows[0].visitNumber + 1} WHERE id=${visits.rows[0].id};`
-
-        await pg.query(query)
+        !visits.rowCount
+            ? await urlRepository.insertVisit(url.rows[0].id)
+            : await urlRepository.updateVisit(visits.rows[0].id, visits.rows[0].visitNumber + 1)
 
         res.status(200).send(url.rows[0].url)
     } catch (error) {
@@ -69,13 +64,13 @@ const deleteUrlById = async (req, res) => {
     const { userId } = res.locals
 
     try {
-        const isUrlValid = await pg.query(`SELECT * FROM urls WHERE id=$1;`, [id])
+        const isUrlValid = await urlRepository.getUrlByColumn('id', id)
 
         if (!isUrlValid.rowCount) return res.sendStatus(404)
 
         if (userId !== isUrlValid.rows[0].userId) return res.sendStatus(401)
 
-        await pg.query(`DELETE FROM urls WHERE id=$1;`, [id])
+        await urlRepository.deleteUrl(id)
 
         res.sendStatus(204)
     } catch (error) {
