@@ -20,7 +20,7 @@ const findUrlById = async (req, res) => {
     const { id } = req.params
 
     try {
-        const url = await urlRepository.getUrlByColumn('urls', id)
+        const url = await urlRepository.getUrlByColumn('id', id)
 
         if (!url.rowCount) return res.sendStatus(404)
 
