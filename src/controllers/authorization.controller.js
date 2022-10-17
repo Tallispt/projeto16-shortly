@@ -1,16 +1,11 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 
-import { signUpSchema, signInSchema } from '../schemas/authorization.schama.js';
 import { authRepository } from '../repositories/authorization.repository.js'
 import { userRepository } from '../repositories/user.repository.js';
 
 const signUp = async (req, res) => {
     const signUpData = req.body
-
-    const validation = signUpSchema.validate(signUpData)
-    if (validation.error)
-        return res.status(422).send(validation.error.details[0].message)
 
     try {
         const emailExists = await userRepository.getUserByColumn('email', signUpData.email)
@@ -28,10 +23,6 @@ const signUp = async (req, res) => {
 
 const signIn = async (req, res) => {
     const signInData = req.body
-
-    const validation = signInSchema.validate(signInData)
-    if (validation.error)
-        return rusersIdes.status(422).send(validation.error.details[0].message)
 
     try {
         const userData = await userRepository.getUserByColumn('email', signInData.email)

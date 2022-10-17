@@ -1,16 +1,10 @@
-import pg from '../database/db.js';
 import { nanoid } from 'nanoid';
 
-import { urlSchema } from '../schemas/url.schema.js'
 import { urlRepository } from '../repositories/urls.repository.js';
 
 const shortenUrl = async (req, res) => {
     const { url } = req.body
     const { userId } = res.locals
-
-    const validation = urlSchema.validate(url)
-    if (validation.error)
-        return res.status(422).send(validation.error.details[0].message)
 
     const shorten = { shortUrl: nanoid(8) }
     try {
@@ -70,6 +64,7 @@ const deleteUrlById = async (req, res) => {
 
         if (userId !== isUrlValid.rows[0].userId) return res.sendStatus(401)
 
+        await urlRepository.deteteVisit(id)
         await urlRepository.deleteUrl(id)
 
         res.sendStatus(204)

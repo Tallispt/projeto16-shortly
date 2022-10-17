@@ -8,7 +8,7 @@ export const userInfo = async (req, res) => {
 
         if (!userInfo.rowCount) return res.sendStatus(404)
 
-        const shortenedUrls = !userInfo.rows[0].id
+        const shortenedUrls = userInfo.rows[0].urlId
             ? userInfo.rows.map(value => {
                 return {
                     id: value.urlId,

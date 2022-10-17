@@ -28,6 +28,10 @@ async function updateVisit(id, visitNumber) {
     await pg.query(`UPDATE visits SET "visitNumber"=${visitNumber} WHERE id=${id};`)
 }
 
+async function deteteVisit(urlId) {
+    await pg.query(`DELETE FROM visits WHERE "urlId"=$1;`, [urlId])
+}
+
 
 export const urlRepository = {
     getUrlByColumn,
@@ -35,5 +39,6 @@ export const urlRepository = {
     deleteUrl,
     getVisitsByColumn,
     insertVisit,
-    updateVisit
+    updateVisit,
+    deteteVisit
 }
