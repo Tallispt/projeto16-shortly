@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors'
 
 import AuthRouter from './routers/authorization.router.js';
 import UrlRouter from './routers/urls.routers.js';
@@ -11,7 +12,7 @@ dotenv.config()
 const server = express()
 
 server.use(express.json())
-// server.use(cors())
+server.use(cors())
 
 server.use(AuthRouter)
 server.use(UrlRouter)
